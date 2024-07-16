@@ -1,0 +1,131 @@
+Notes on webdriver IO 
+
+1. maxInstances: (outisde capabilites (global)) -- it define how how many instance wdio can open at time.
+
+2. maxInstances: (inside  capabilites where broswer is chrome ) -- it define how many instance chrome 
+can hanlde at a time it can override gobal maxinstances
+
+3. Headless node - following command need to added  in chome option in wdio.config.js
+    'goog:chromeOptions': {
+        args: ['headless', 'disable-gpu']
+    }
+
+4. to run selected "Test" mean it block - we need to provide some keyword in "it" description    
+   example - wdio wdio.conf.js --mochaOpts.grep <# tagname given in the it block> 
+   example -   it("Shop page smoke")
+   run command - npx wdio run ./wdio.conf.js  --mochaOpts.grep smoke
+
+5.  Bail- it used to stop test when it fail certain time -- value is given in bail 
+    default value of bail is zero it mean dont stop for any failure 
+
+6. baseurl - we can give the url  in baseurl in wdio.conf.js file  and it test will pick from here 
+   example - baseUrl : 'https://rahulshettyacademy.com',
+    Spec file - await browser.url("/loginpagePractise/")
+   at run time it will read as https://rahulshettyacademy.com/loginpagePractise/
+
+7. comtrolling the execution of test through command line 
+   1. create suite and add the test case which is part of that in wido.conf.js
+   2. when we run have use --suite  <#suiteName> 
+
+   step 1 add suite in wido.conf.js 
+      
+       suites:{
+        uiControls: ['test/specs/uiControls.js'],
+        windowsFrame:['test/specs/windowsFrame.js']
+    }
+
+    step 2 - run command - npx wdio run ./wdio.conf.js  --suite uiControls
+
+8. To run specific spec file  --spec <#  reative path of spec filename> 
+   example - npx wdio run ./wdio.conf.js  --spec test/specs/eCommerceE2E.js
+
+9. exclude - to add spec we want to exclude 
+ exclude: [
+        // 'path/to/excluded/files'
+        ' test/specs/eCommerceE2E.js'
+    ]
+
+ 10. mutliple config file  based on evn
+
+      QA-UAT- Production 
+    step 1- create file like wdio.qa.conf.js 
+< asked question in chapter 67
+
+
+11.  Retries 
+  
+   . In order to use the this.retries() method, the suite block describe must use an unbound function
+    function(){} instead of a fat arrow function () => {}, as described in Mocha docs. 
+   Using Mocha you can also set a retry count for all specs using mochaOpts.retries in your wdio.conf.js.
+   
+    Type 1  - on golbal level
+example mochaOpts: {
+        ui: 'bdd',
+        timeout: 60000,
+        retries:3
+    },
+
+Type 2 - On specific describe level
+    describe('Ecommerce Application',function (){
+    this.retries(2)
+    })
+   
+11 creating own script in package.json  
+
+step 1 
+ "eCommerceE2E": "npx wdio run ./wdio.conf.js  --spec test/specs/eCommerceE2E.js"
+step 2
+To run we use  "npm run eCommerceE2E"
+
+12. allure report
+step1 downnload allure report 
+https://webdriver.io/docs/allure-reporter/
+
+npm install @wdio/allure-reporter --save-dev
+
+step 2 
+add report 
+
+ reporters: [['allure', {
+        outputDir: 'allure-results',
+        disableWebdriverStepsReporting: true,
+        disableWebdriverScreenshotsReporting: false,( by default it is true make it false to screenshot if test fail)
+ }]]
+
+
+step 3  add in afterTestHook 
+example
+ afterTest: async function(test, context, { error, result, duration, passed, retries }) {
+        if (error) {
+            await browser.takeScreenshot();
+        }
+    },
+step 5 allure-results is generated but we need allure commandline tool to open it 
+we need to install allure-commandline to execute allure open command
+
+  npm install -g allure-commandline --save-dev
+
+Step 6 -> to open arllure report 
+ syntax -- to run in cmd of termainal
+  allure generate [allure_output_dir] && allure open
+example - allure generate allure-results && allure open
+
+ but when I tried to open it it getting error saying 
+ At line:1 char:32
++ allure generate allure-results && allure open
++                                ~~
+The token '&&' is not a valid statement separator in this version.
+    + CategoryInfo          : ParserError: (:) [], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : InvalidEndOfLine
+to make it work
+go to cmd (location of project ) and execute it 
+allure generate allure-results && allure open
+
+In package.json 
+ Script section add below command to open/generate and clean allure report
+"report-open": "allure open allure-report",
+"report-generate": "allure generate --clean allure-results",
+"pretest": "rimraf allure-reslocults && rimraf allure-report && rimraf test-screenshots && rimraf wdio-logs"
+
+#Jenkins
+

@@ -1,0 +1,33 @@
+# Jenkins 
+https://www.jenkins.io/download/
+step 1 - download the window msi  and install it 
+step 2 - setup the jenkins 
+step 3 create job ( free style)
+step 4 - select the option - this project is parametetize -choice paramater
+ Name - script 
+ choices  
+      a. poTest. 
+      b. uiControls
+
+ step5 Build Step 
+       Execute Window Batch command 
+       npm run %script% ( which is varible define in step 4 ( Line 7))     
+step 5.1 - save and run
+
+Step 6 - Need to integrate the allure report
+  install allure plugin
+step 7 - manage jenkins - when we install the allure  plugin we see  option
+Allure command line installation ( click option)
+ step 8 in option 
+ 
+ Extract *.zip/*.tar.gz give below url 
+ 
+  -https://github.com/allure-framework/allure2/releases/download/2.30.0/allure-2.30.0.zip
+
+
+  Step 9 - Post build action 
+  select allure report 
+  path - give the folder name  which we given in wdio config file for saving allure report 
+   "allure-report"
+   step 10 - save and run  and u see alllure report  got genrated
+   
